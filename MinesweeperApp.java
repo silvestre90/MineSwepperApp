@@ -26,17 +26,19 @@ public class MinesweeperApp {
 
     Scene scene;
 
-    private int tileSize = 30;
+    private int fieldSize = 30;
     private int width;
     private int height = 600;
     private static final int INFO_BOX_HEIGHT = 45;
     private int bombsInField;
+    private int bombsToWin;
     private int X_FIELDS;
     private int Y_FIELDS;
 
     private Field[][] grid;
     private Label textLabel = new Label();
     private Label label;
+
     Stage window;
 
 
@@ -78,15 +80,15 @@ public class MinesweeperApp {
                     }
 
 
-                    Field tile = new Field(x, y, shouldBombBePlacedHere);
+                    Field field = new Field(x, y, shouldBombBePlacedHere);
 
                     if(shouldBombBePlacedHere){
                         remainingBombs--;
                     }
                     remainingFields--;
 
-                    grid[x][y] = tile;
-                    root.getChildren().addAll(tile);
+                    grid[x][y] = field;
+                    root.getChildren().addAll(field);
                 }
             }
             if(remainingBombs == 0){
@@ -95,12 +97,12 @@ public class MinesweeperApp {
         }
         for(int y=0; y < Y_FIELDS; y++){
             for(int x=0; x < X_FIELDS; x++){
-                Field tile = grid[x][y];
+                Field field = grid[x][y];
 //                set bombs
-                if(!tile.hasBomb) {
-                    long bombs = getNeighbours(tile).stream().filter(t -> t.hasBomb).count();
+                if(!field.hasBomb) {
+                    long bombs = getNeighbours(field).stream().filter(t -> t.hasBomb).count();
 
-                    if(bombs >0) tile.text.setText(String.valueOf(bombs));
+                    if(bombs >0) field.text.setText(String.valueOf(bombs));
 
                 }
 
@@ -116,7 +118,7 @@ public class MinesweeperApp {
     }
 
 
-    private List<Field> getNeighbours(Field tile){
+    private List<Field> getNeighbours(Field field){
         List<Field> neighbours = new ArrayList<Field>();
 
         int[] points = new int[] {
@@ -134,8 +136,8 @@ public class MinesweeperApp {
             int dx = points[i];
             int dy = points[++i];
 
-            int newX = tile.x + dx;
-            int newY = tile.y + dy;
+            int newX = field.x + dx;
+            int newY = field.y + dy;
 
             if(isValidCorner(newX, newY)){
                 neighbours.add(grid[newX][newY]);
@@ -162,7 +164,7 @@ public class MinesweeperApp {
         private static final char BLACK_COLOR_SYMBOL = 'B';
 
 
-        private Rectangle border = new Rectangle(tileSize-2, tileSize-2);
+        private Rectangle border = new Rectangle(fieldSize-2, fieldSize-2);
         private Text text = new Text();
 
 
@@ -181,8 +183,8 @@ public class MinesweeperApp {
 
             getChildren().addAll(border, text);
 
-            setTranslateX(x* tileSize);
-            setTranslateY(y* tileSize + INFO_BOX_HEIGHT);
+            setTranslateX(x* fieldSize);
+            setTranslateY(y* fieldSize + INFO_BOX_HEIGHT);
 
 
 
@@ -237,9 +239,20 @@ public class MinesweeperApp {
 
             if(colorSymbol == RED_COLOR_SYMBOL){
                 border.setFill(Color.RED);
-            }else border.setFill(Color.BLACK);
+                if(hasBomb){
+                    bombsToWin--;
+                }
+            }else {
+                border.setFill(Color.DARKBLUE);
+                if(hasBomb){
+                    bombsToWin++;
+                }
+            }
 
-
+            System.out.println(bombsToWin);
+            if(bombsToWin == 0){
+                display("Victory", "Congratulations, you know the game by finding " + bombsInField + " bombs.");
+            }
         }
 
         public void display(String title, String message){
@@ -258,6 +271,7 @@ public class MinesweeperApp {
             label.setText(message);
             Button continueButton = new Button("Play again");
             Button closeButton = new Button("Quit title");
+            Button mainmenuButton = new Button("Main menu");
 
             continueButton.setPrefSize(100,50);
             continueButton.setOnAction(e -> {
@@ -271,12 +285,26 @@ public class MinesweeperApp {
                 window.close();
             });
 
+            mainmenuButton.setPrefSize(100,50);
+            mainmenuButton.setOnAction(e -> {
+                alertWindow.close();
+                window.close();
+
+                MinesweeperMain minesweeperMain = new MinesweeperMain();
+                Stage stage = new Stage();
+                try {
+                    minesweeperMain.start(stage);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            });
+
 
 
             VBox layout = new VBox(10);
             HBox buttonContainer = new HBox(10);
             buttonContainer.setAlignment(Pos.CENTER);
-            buttonContainer.getChildren().addAll(continueButton,closeButton);
+            buttonContainer.getChildren().addAll(continueButton,closeButton,mainmenuButton);
             layout.getChildren().addAll(label, buttonContainer);
             layout.setAlignment(Pos.CENTER);
 
@@ -321,17 +349,17 @@ public class MinesweeperApp {
                 break;
             case "TWENTY_FIVE":
                 gridSize = 25;
-                this.tileSize = 25;
+                this.fieldSize = 25;
                 break;
             case "THIRTY":
                 gridSize = 30;
-                this.tileSize = 21;
+                this.fieldSize = 21;
                 break;
         }
 
         switch (difficulty){
             case "EASY":
-                this.bombsInField = (int)(0.1*(gridSize*gridSize));
+                this.bombsInField = (int)(0.02*(gridSize*gridSize));
                 break;
             case "MEDIUM":
                 this.bombsInField = (int)(0.18*(gridSize*gridSize));
@@ -341,11 +369,13 @@ public class MinesweeperApp {
                 break;
         }
 
+        this.bombsToWin = bombsInField;
+        System.out.println(bombsToWin);
         X_FIELDS = gridSize;
         Y_FIELDS = gridSize;
         grid = new Field[X_FIELDS][Y_FIELDS];
-        this.width  = gridSize*this.tileSize;
-        this.height = gridSize*this.tileSize+INFO_BOX_HEIGHT;
+        this.width  = gridSize*this.fieldSize;
+        this.height = gridSize*this.fieldSize+INFO_BOX_HEIGHT;
 
         window = new Stage();
         scene = new Scene(createContent());
