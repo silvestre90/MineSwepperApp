@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="200.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="startPageController">
+<AnchorPane prefHeight="218.0" prefWidth="391.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="startPageController">
    <children>
       <ComboBox fx:id="cmbDifficulty" editable="true" layoutX="133.0" layoutY="53.0" prefHeight="25.0" prefWidth="190.0" promptText="Open List" />
       <ComboBox fx:id="cmbGrid" editable="true" layoutX="133.0" layoutY="100.0" prefHeight="25.0" prefWidth="190.0" promptText="Open List" />
@@ -19,6 +19,7 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <Label fx:id="lblError" layoutX="15.0" layoutY="140.0" prefHeight="41.0" prefWidth="90.0" />
+      <Label fx:id="lblError" layoutX="9.0" layoutY="140.0" prefHeight="62.0" prefWidth="123.0" />
+      <Button fx:id="btnResults" layoutX="133.0" layoutY="181.0" mnemonicParsing="false" onAction="#showBestResults" prefHeight="25.0" prefWidth="190.0" text="Show Best Results" />
    </children>
 </AnchorPane>

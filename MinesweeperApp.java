@@ -19,6 +19,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -38,8 +40,15 @@ public class MinesweeperApp {
     private Field[][] grid;
     private Label textLabel = new Label();
     private Label label;
+    private String currentLevel, currentGridSize;
+    public static String tableName;
 
     Stage window;
+
+    public Date startTime, endTime;
+    public int gameLaunchedTime = 0;
+    public static int finalResult;
+
 
 
     public Parent createContent(){
@@ -164,6 +173,7 @@ public class MinesweeperApp {
         private static final char BLACK_COLOR_SYMBOL = 'B';
 
 
+
         private Rectangle border = new Rectangle(fieldSize-2, fieldSize-2);
         private Text text = new Text();
 
@@ -249,9 +259,13 @@ public class MinesweeperApp {
                 }
             }
 
-            System.out.println(bombsToWin);
+//            System.out.println(bombsToWin);
             if(bombsToWin == 0){
-                display("Victory", "Congratulations, you know the game by finding " + bombsInField + " bombs.");
+                endTime = new Date();
+                long diff = (endTime.getTime() - startTime.getTime())/1000;
+                finalResult = (int)(diff);
+
+                display("Victory", "Congratulations, you won the game by finding " + bombsInField + " bombs." + "\n" + "Your time: " + finalResult + " seconds.");
             }
         }
 
@@ -272,11 +286,38 @@ public class MinesweeperApp {
             Button continueButton = new Button("Play again");
             Button closeButton = new Button("Quit title");
             Button mainmenuButton = new Button("Main menu");
+            Button saveResultButton = new Button("Save Result");
+
+            saveResultButton.setPrefSize(100,50);
+            saveResultButton.setOnAction(e -> {
+                window.close();
+                alertWindow.close();
+
+                Parent root = null;
+                try {
+                    root = (Parent) FXMLLoader.load(getClass().getResource("resultSaver.fxml"));
+                    Stage saveResultWindow = new Stage();
+                    Scene scene = new Scene(root);
+                    saveResultWindow.setScene(scene);
+                    saveResultWindow.setTitle("Save your performance");
+                    saveResultWindow.show();
+
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+            });
 
             continueButton.setPrefSize(100,50);
             continueButton.setOnAction(e -> {
+                window.close();
                 alertWindow.close();
-                scene.setRoot(createContent());
+                try {
+
+                    startGame( currentGridSize, currentLevel);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
             });
 
             closeButton.setPrefSize(100,50);
@@ -304,7 +345,7 @@ public class MinesweeperApp {
             VBox layout = new VBox(10);
             HBox buttonContainer = new HBox(10);
             buttonContainer.setAlignment(Pos.CENTER);
-            buttonContainer.getChildren().addAll(continueButton,closeButton,mainmenuButton);
+            buttonContainer.getChildren().addAll(continueButton,closeButton,mainmenuButton,saveResultButton);
             layout.getChildren().addAll(label, buttonContainer);
             layout.setAlignment(Pos.CENTER);
 
@@ -343,6 +384,11 @@ public class MinesweeperApp {
 
         int gridSize = 0;
         this.bombsInField = 0;
+        this.currentGridSize = gridDimensions;
+        this.currentLevel = difficulty;
+        tableName = this.currentLevel + "_" + this.currentGridSize;
+        gameLaunchedTime++;
+
         switch (gridDimensions){
             case "TWENTY":
                 gridSize = 20;
@@ -359,18 +405,18 @@ public class MinesweeperApp {
 
         switch (difficulty){
             case "EASY":
-                this.bombsInField = (int)(0.02*(gridSize*gridSize));
+                this.bombsInField = (int)(0.07*(gridSize*gridSize));
                 break;
             case "MEDIUM":
-                this.bombsInField = (int)(0.18*(gridSize*gridSize));
+                this.bombsInField = (int)(0.12*(gridSize*gridSize));
                 break;
             case "HARD":
-                this.bombsInField = (int)(0.26*(gridSize*gridSize));
+                this.bombsInField = (int)(0.18*(gridSize*gridSize));
                 break;
         }
 
         this.bombsToWin = bombsInField;
-        System.out.println(bombsToWin);
+//        System.out.println(bombsToWin);
         X_FIELDS = gridSize;
         Y_FIELDS = gridSize;
         grid = new Field[X_FIELDS][Y_FIELDS];
@@ -381,6 +427,12 @@ public class MinesweeperApp {
         scene = new Scene(createContent());
         window.setScene(scene);
         window.setTitle("Minesweeper");
+        startTime = new Date();
+
+        if(gameLaunchedTime >= 2){
+            label.setText(String.valueOf(bombsInField +1));
+        }
+//        System.out.println(startTime);
         window.show();
     }
 

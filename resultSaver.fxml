@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane prefHeight="135.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="resultSaveController">
+   <children>
+      <TextField fx:id="txtName" layoutX="83.0" layoutY="28.0" prefHeight="25.0" prefWidth="199.0" promptText="Enter your name here" />
+      <Label layoutX="22.0" layoutY="32.0" prefHeight="17.0" prefWidth="43.0" text="Name:" />
+      <Label layoutX="161.0" layoutY="68.0" prefHeight="17.0" prefWidth="43.0" text="Result:" />
+      <Label fx:id="lblResult" layoutX="213.0" layoutY="68.0" prefHeight="17.0" prefWidth="66.0" />
+      <Button fx:id="btnOK" layoutX="161.0" layoutY="102.0" mnemonicParsing="false" onAction="#commitChanges" prefHeight="25.0" prefWidth="105.0" text="Confirm" />
+      <Label fx:id="lblAlert" layoutX="22.0" layoutY="106.0" prefHeight="17.0" prefWidth="105.0" />
+   </children>
+</AnchorPane>
